@@ -253,6 +253,8 @@ describe MergeEnum::MergeEnumerable do
         first: 200
       )
       enum_sub = enum.each
+      expect(enum).to be_a(Enumerable)
+      expect(enum_sub).to be_a(Enumerable)
       expect(enum_sub).not_to be(enum)
       expect(enum_sub.to_a).to eq(enum.to_a)
     end
