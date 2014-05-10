@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = MergeEnum::VERSION
   spec.authors       = ["brightgenerous"]
   spec.email         = ["katou.akihiro@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{merge enumerable}
+  spec.description   = %q{merge enumerable}
   spec.homepage      = ""
   spec.license       = "MIT"
 
