@@ -1,6 +1,8 @@
 # MergeEnum
 
-TODO: Write a gem description
+複数のEnumeraleを連結（合成）するEnumerableです。  
+要素が必要になった時点で追加するように動作します。  
+効率的なはずです。
 
 ## Installation
 
@@ -18,7 +20,20 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    > m_enum = MergeEnum::MergeEnumerable.new(
+           [0,1,2,3,4,5,6,7,8,9],
+           10...20,
+           -> { 20...30 },
+           -> (c) { 30...40 },       # c => 25
+           Proc.new { 40...50 },
+           Proc.new { |c| 50...60 }, # c => 5
+           Proc.new { 60...70 },     # => never called
+           first: 55
+         )
+    > m_enum.is_a? Enumerable
+      => true
+    > m_enum.count
+      => 55
 
 ## Contributing
 
