@@ -1,7 +1,8 @@
 # MergeEnum
 
-複数のEnumeraleを合成するEnumerableです。  
-要素が必要になった時点で効率的に追加するように動作します。
+複数のEnumeraleを連結（合成）するEnumerableです。  
+要素が必要になった時点で追加するように動作します。  
+効率的なはずです。
 
 ## Installation
 
