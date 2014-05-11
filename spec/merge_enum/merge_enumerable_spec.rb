@@ -274,5 +274,48 @@ describe MergeEnum::MergeEnumerable do
     end
   end
 
+  describe ":concat Method" do
+    it "equality enumerator" do
+      enm_1 = 0...100
+      enm_2 = -> (c) { arg1 = c; 200...250 }
+      enm_3 = Proc.new { |c| arg2 = c; 300...330 }
+      enum = MergeEnum::MergeEnumerable.new(
+        enm_1, enm_2,
+        first: 130
+      )
+      expect(enum.concat enm_3).not_to be(enum)
+
+      enum_2 = MergeEnum::MergeEnumerable.new(
+        enm_1, enm_2, enm_3,
+        first: 130
+      )
+      expect(enum.concat(enm_3).to_a).to eq(enum_2.to_a)
+    end
+  end
+
+  describe ":concat! Method" do
+    it "equality enumerator" do
+      enm_1 = 0...100
+      enm_2 = -> (c) { arg1 = c; 200...250 }
+      enm_3 = Proc.new { |c| arg2 = c; 300...330 }
+      enum = MergeEnum::MergeEnumerable.new(
+        enm_1, enm_2,
+        first: 130
+      )
+      expect(enum.concat! enm_3).to be(enum)
+
+      enum = MergeEnum::MergeEnumerable.new(
+        enm_1, enm_2,
+        first: 130
+      )
+
+      enum_2 = MergeEnum::MergeEnumerable.new(
+        enm_1, enm_2, enm_3,
+        first: 130
+      )
+      expect(enum.concat!(enm_3).to_a).to eq(enum_2.to_a)
+    end
+  end
+
 end
 
