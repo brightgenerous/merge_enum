@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 module MergeEnum
 
   class MergeEnumerable
@@ -37,6 +37,15 @@ module MergeEnum
         end
         cnt += c.count
       end
+      self
+    end
+
+    def concat arg
+      self.class.new *@collections, arg, @options
+    end
+
+    def concat! arg
+      @collections.push arg
       self
     end
 
