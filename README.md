@@ -27,7 +27,7 @@ Or install it yourself as:
            -> (c) { 30...40 },       # c => 25
            Proc.new { 40...50 },
            Proc.new { |c| 50...60 }, # c => 5
-           Proc.new { 70...80 },     # => never called
+           Proc.new { 60...70 },     # => never called
            first: 55
          )
     > m_enum.is_a? Enumerable
