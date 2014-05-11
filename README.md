@@ -1,8 +1,10 @@
 # MergeEnum
 
-複数のEnumeraleを連結（合成）するEnumerableです。  
+複数のEnumerale(*1)を連結（合成）するEnumerableです。  
 要素が必要になった時点で追加するように動作します。  
 効率的なはずです。
+
+(*1) `each``first`メソッドが定義されていれば、Enumerableでなくても可
 
 ## Installation
 
@@ -20,6 +22,10 @@ Or install it yourself as:
 
 ## Usage
 
+    > require 'merge_enum'
+
+#### 基本的な使い方
+
     > m_enum = MergeEnum::MergeEnumerable.new(
            [0,1,2,3,4,5,6,7,8,9],
            10...20,
@@ -34,6 +40,42 @@ Or install it yourself as:
       => true
     > m_enum.count
       => 55
+
+#### Enumerable#merge_enum から生成できるようにしました
+
+    > m_enum = (0...10).merge_enum(first: 13)
+      => #<MergeEnum::MergeEnumerable:0x007fa...>
+
+#### concat, concat! で連結できるようにしました
+
+    > m_enum = (0...10).merge_enum(first: 13)
+      => #<MergeEnum::MergeEnumerable:0x007fb...>
+    > m_enum = m_enum.concat(10...15)
+      => #<MergeEnum::MergeEnumerable:0x008fb...>
+    > m_enum.to_a
+      => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    
+    > m_enum = (0...10).merge_enum(first: 13)
+      => #<MergeEnum::MergeEnumerable:0x007fc...>
+    > m_enum.concat!(10...15)
+      => #<MergeEnum::MergeEnumerable:0x007fc...>
+    > m_enum.to_a
+      => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+### メソッド定義
+
+* `MergeEnum::MergeEnumerable.new(enum_1, enum_2, ... , options = {})`  
+    `enum_x`  : Enumerable(*1)、もしくは、Enumerable(*1)を返すProcオブジェクト  
+    `options` : ハッシュ形式のオプション `{ first: <Integer:要素を取得する最大サイズ> }`
+
+* `Enumerable#merge_enum(enum_2, enum_3, ... , options = {})`  
+    レシーバ自身を`enum_1`として、`MergeEnumerable.new(enum_1, enum_2, enum_3, ... , options)`を返します
+
+* `MergeEnumerable#concat(enum)`  
+    末尾に`enum`を追加した`MergeEnumerable`を生成して返します
+
+* `MergeEnumerable#concat!(enum)`  
+    末尾に`enum`を追加し、`self`を返します
 
 ## Contributing
 
