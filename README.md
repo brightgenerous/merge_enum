@@ -1,10 +1,11 @@
 # MergeEnum
+###### ver 0.2.0
 
 複数のEnumerale(*1)を連結（合成）するEnumerableです。  
 要素が必要になった時点で追加するように動作します。  
 効率的なはずです。
 
-(*1) `each``first`メソッドが定義されていれば、Enumerableでなくても可
+(*1) `each`,`first`メソッドが定義されていれば、Enumerableでなくても可
 
 ## Installation
 
