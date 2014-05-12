@@ -1,11 +1,11 @@
 # MergeEnum
-###### ver 0.2.0
+###### ver 0.2.1
 
 複数のEnumerale(*1)を連結（合成）するEnumerableです。  
 要素が必要になった時点で追加するように動作します。  
-効率的なはずです。
+効率的です。
 
-(*1) `each`,`first`メソッドが定義されていれば、Enumerableでなくても可
+(*1) `each`,`first`メソッドが定義されていればEnumerableでなくてもよく、それを返すProc, Lambdaでもよい。
 
 ## Installation
 
@@ -42,12 +42,12 @@ Or install it yourself as:
     > m_enum.count
       => 55
 
-#### Enumerable#merge_enum から生成できるようにしました
+#### Enumerable#merge_enum から生成できる
 
     > m_enum = (0...10).merge_enum(first: 13)
       => #<MergeEnum::MergeEnumerable:0x007fa...>
 
-#### concat, concat! で連結できるようにしました
+#### concat, concat! で連結できる
 
     > m_enum = (0...10).merge_enum(first: 13)
       => #<MergeEnum::MergeEnumerable:0x007fb...>
