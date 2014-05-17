@@ -1,5 +1,5 @@
 # MergeEnum
-###### ver 0.2.2
+###### ver 0.3.0
 
 複数のEnumerale(*1)を連結（合成）するEnumerableです。  
 要素が必要になった時点で追加するように動作します。  
@@ -67,7 +67,7 @@ Or install it yourself as:
 
 * `MergeEnum::MergeEnumerable.new(enum_1, enum_2, ... , options = {})`  
     `enum_x`  : Enumerable(*1)、もしくは、Enumerable(*1)を返すProcオブジェクト  
-    `options` : ハッシュ形式のオプション `{ first: <Integer:要素を取得する最大サイズ> }`
+    `options` : ハッシュ形式のオプション `{ first: <Integer:要素を取得する最大サイズ>, compact: <bool|Proc:nilを判定して除去する> }`
 
 * `Enumerable#merge_enum(enum_2, enum_3, ... , options = {})`  
     レシーバ自身を`enum_1`として、`MergeEnumerable.new(enum_1, enum_2, enum_3, ... , options)`を返します
