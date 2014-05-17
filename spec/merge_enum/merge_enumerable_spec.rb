@@ -272,7 +272,7 @@ describe MergeEnum::MergeEnumerable do
         first: 200
       )
       expect(ary_1).to receive(:first).with(200).and_return(ary_1)
-      ary_2.stub(:first) { raise "unexpected" }
+      allow(ary_2).to receive(:first).and_raise("unexpected")
       expect(ary_3).to receive(:first).with(50).and_return(ary_3)
       expect(enum.count).to be 180
     end
