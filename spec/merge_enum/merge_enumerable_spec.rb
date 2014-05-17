@@ -248,8 +248,8 @@ describe MergeEnum::MergeEnumerable do
     it "equality enumerator" do
       enum = MergeEnum::MergeEnumerable.new(
         0...100,
-        -> (c) { arg1 = c; 200...250 },
-        Proc.new { |c| arg2 = c; 300...330 },
+        -> (c) { 200...250 },
+        Proc.new { |c| 300...330 },
         first: 200
       )
       enum_sub = enum.each
@@ -262,14 +262,18 @@ describe MergeEnum::MergeEnumerable do
 
   describe "Whitebox" do
     it "call first method" do
-      ary = (0...100)
+      ary_1 = 0...100
+      ary_2 = 200...250
+      ary_3 = 300...330
       enum = MergeEnum::MergeEnumerable.new(
-        ary,
-        -> (c) { arg1 = c; 200...250 },
-        Proc.new { |c| arg2 = c; 300...330 },
+        ary_1,
+        -> (c) { ary_2 },
+        Proc.new { ary_3 },
         first: 200
       )
-      expect(ary).to receive(:first).with(200).and_return(ary)
+      expect(ary_1).to receive(:first).with(200).and_return(ary_1)
+      ary_2.stub(:first) { raise "unexpected" }
+      expect(ary_3).to receive(:first).with(50).and_return(ary_3)
       expect(enum.count).to be 180
     end
   end
@@ -277,8 +281,8 @@ describe MergeEnum::MergeEnumerable do
   describe ":concat Method" do
     it "equality enumerator" do
       enm_1 = 0...100
-      enm_2 = -> (c) { arg1 = c; 200...250 }
-      enm_3 = Proc.new { |c| arg2 = c; 300...330 }
+      enm_2 = -> (c) { 200...250 }
+      enm_3 = Proc.new { |c| 300...330 }
       enum = MergeEnum::MergeEnumerable.new(
         enm_1, enm_2,
         first: 130
@@ -296,8 +300,8 @@ describe MergeEnum::MergeEnumerable do
   describe ":concat! Method" do
     it "equality enumerator" do
       enm_1 = 0...100
-      enm_2 = -> (c) { arg1 = c; 200...250 }
-      enm_3 = Proc.new { |c| arg2 = c; 300...330 }
+      enm_2 = -> (c) { 200...250 }
+      enm_3 = Proc.new { |c| 300...330 }
       enum = MergeEnum::MergeEnumerable.new(
         enm_1, enm_2,
         first: 130

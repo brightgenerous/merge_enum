@@ -24,18 +24,29 @@ module MergeEnum
           fst = opt_fst - cnt
           break if fst <= 0
         end
+        called_first = false
         if c.is_a? Proc
           if c.arity == 0
             c = c.call
           else
             c = c.call fst
+            called_first = true
           end
         end
-        c = c.first fst if fst
-        c.each do |i|
-          block.call i
+        if fst
+          c = c.first fst unless called_first
+          _cnt = 0
+          c.each.with_index 1 do |e, i|
+            block.call e
+            _cnt = i
+            break if fst <= _cnt
+          end
+          cnt += _cnt
+        else
+          c.each do |e|
+            block.call e
+          end
         end
-        cnt += c.count
       end
       self
     end
