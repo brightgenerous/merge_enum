@@ -1,5 +1,5 @@
 # MergeEnum
-###### ver 0.4.0
+###### ver 0.5.0
 
 複数のEnumerale(*1)を連結（合成）するEnumerableです。  
 要素が必要になった時点で追加するように動作します。  
@@ -42,26 +42,46 @@ Or install it yourself as:
     > m_enum.count
       => 55
 
-#### Enumerable#merge_enum から生成できる
+#### `Enumerable#merge_enum` から生成
 
     > m_enum = (0...10).merge_enum(first: 13)
       => #<MergeEnum::MergeEnumerable:0x007fa...>
 
-#### concat, concat! で連結できる
+#### `concat`, `concat!` で連結
 
     > m_enum = (0...10).merge_enum(first: 13)
-      => #<MergeEnum::MergeEnumerable:0x007fb...>
     > m_enum = m_enum.concat(10...15)
-      => #<MergeEnum::MergeEnumerable:0x008fb...>
     > m_enum.to_a
       => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     
     > m_enum = (0...10).merge_enum(first: 13)
-      => #<MergeEnum::MergeEnumerable:0x007fc...>
     > m_enum.concat!(10...15)
-      => #<MergeEnum::MergeEnumerable:0x007fc...>
     > m_enum.to_a
       => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+#### `options`(alias: `merge_options`), `options!`(alias: `merge_options!`) でoptionsを追加
+
+    > m_enum = MergeEnum::MergeEnumerable.new(0...100, { first: 10, select: -> (c) { c.odd? } })
+    > m_enum = m_enum.merge_options({ first: 5 })
+    > m_enum.to_a
+      => [1, 3, 5, 7, 9]
+    
+    > m_enum = MergeEnum::MergeEnumerable.new(0...100, { first: 10, select: -> (c) { c.odd? } })
+    > m_enum.merge_options!({ first: 5 })
+    > m_enum.to_a
+      => [1, 3, 5, 7, 9]
+
+#### `replace_options`, `replace_options!` でoptionsを変更
+
+    > m_enum = MergeEnum::MergeEnumerable.new(0...100, { first: 10, select: -> (c) { c.odd? } })
+    > m_enum = m_enum.replace_options({ first: 5 })
+    > m_enum.to_a
+      => [0, 1, 2, 3, 4]
+    
+    > m_enum = MergeEnum::MergeEnumerable.new(0...100, { first: 10, select: -> (c) { c.odd? } })
+    > m_enum.replace_options!({ first: 5 })
+    > m_enum.to_a
+      => [0, 1, 2, 3, 4]
 
 ### メソッド定義
 
@@ -80,6 +100,24 @@ Or install it yourself as:
 
 * `MergeEnumerable#concat!(enum)`  
     末尾に`enum`を追加し、`self`を返します
+
+* `MergeEnumerable#options(opts)`  
+    オプションに`opts`をマージした`MergeEnumerable`を生成して返します
+
+* `MergeEnumerable#options!(opts)`  
+    オプションに`opts`をマージし、`self`を返します
+
+* `MergeEnumerable#merge_options(opts)`  
+    `#options`のエイリアスです
+
+* `MergeEnumerable#merge_options!(opts)`  
+    `#options!`のエイリアスです
+
+* `MergeEnumerable#replace_options(opts)`  
+    オプションを`opts`に置き換えた`MergeEnumerable`を生成して返します
+
+* `MergeEnumerable#replace_options!(opts)`  
+    オプションを`opts`に置き換え、`self`を返します
 
 ## Contributing
 

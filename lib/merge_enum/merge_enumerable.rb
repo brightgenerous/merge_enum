@@ -117,6 +117,28 @@ module MergeEnum
       self
     end
 
+    def merge_options opts
+      self.class.new *@collections, (@options.merge opts || {})
+    end
+
+    def merge_options! opts
+      @options.merge! opts || {}
+      self
+    end
+
+    def replace_options opts
+      self.class.new *@collections, opts || {}
+    end
+
+    def replace_options! opts
+      @options = opts || {}
+      self
+    end
+
+    alias_method :options, :merge_options
+
+    alias_method :options!, :merge_options!
+
   end
 
 end
