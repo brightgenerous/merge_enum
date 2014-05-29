@@ -1047,6 +1047,59 @@ describe MergeEnum::MergeEnumerable do
   end
 
   describe ".new" do
+    describe "0...100, Array.new(10, nil), Proc.new { |c| 200...250 }, first: 130, compact: true, map: -> (e) { e * 2 }" do
+      let(:enum) { Target.new 0...100, Array.new(10, nil), Proc.new { |c| 200...250 }, first: 130, compact: true, map: map }
+      let(:map) {
+        _proc = -> (e) { raise "using stub" }
+        expect(_proc).to receive(:call).exactly(130).times do |e|
+          e * 2
+        end
+        _proc
+      }
+      subject { enum.to_a }
+      it {
+        is_expected.to eq ((0...100).to_a + (200...230).to_a).map{ |e| e * 2 }
+      }
+    end
+  end
+
+  describe ".new" do
+    describe "-> { 0...100 }," do
+      let(:enum) { Target.new ary, cache: cache }
+
+      describe "cache: false" do
+        let(:cache) { false }
+        let(:ary) {
+          _proc = -> (e) { raise "using stub" }
+          expect(_proc).to receive(:call).exactly(10).times.and_return 0...100
+          _proc
+        }
+        it {
+          10.times do
+            enum.to_a
+          end
+        }
+      end
+
+      describe "cache: true" do
+        let(:cache) { true }
+        let(:ary) {
+          _proc = -> (e) { raise "using stub" }
+          expect(_proc).to receive(:call).exactly(2).times.and_return 0...100
+          _proc
+        }
+        it {
+          10.times do
+            enum.to_a
+          end
+          enum.options! cache: false
+          enum.to_a
+        }
+      end
+    end
+  end
+
+  describe ".new" do
     describe "0...100, Proc.new { |c| 200...250 }, first: 160" do
       let(:enum) { Target.new 0...100, Proc.new { |c| 200...250 }, first: 160 }
       it { expect(enum).to be enum }
