@@ -31,7 +31,7 @@ module MergeEnum
       opt_fst = @options[:first]
       opt_fst = opt_fst.to_i if opt_fst
       (opt_proc, _proc) = merge_options_proc @options
-      opt_map = map_proc @options
+      (opt_map, _map) = map_proc @options
 
       # local variables
       cnt = 0
@@ -69,8 +69,8 @@ module MergeEnum
           c = c.first fst unless called_first or _proc
           _cnt = 0
           c.each do |e|
-            next if _proc and not opt_proc.call(e, cnt)
-            e = opt_map.call(e, cnt)
+            next if _proc and not opt_proc.call e, cnt
+            e = opt_map.call e, cnt if _map
             block.call e
             cache.push e if cache
             cnt += 1
@@ -80,8 +80,8 @@ module MergeEnum
         else
           # without first option
           c.each do |e|
-            next if _proc and not opt_proc.call(e, cnt)
-            e = opt_map.call(e, cnt)
+            next if _proc and not opt_proc.call e, cnt
+            e = opt_map.call e, cnt if _map
             block.call e
             cache.push e if cache
             cnt += 1
@@ -151,19 +151,20 @@ module MergeEnum
         unless opt_map.is_a? Proc
           raise ":map is must be a Proc"
         end
-        case opt_map.arity
+        arity = opt_map.arity.abs
+        case arity
         when 0
-          -> (e, i) { opt_map.call }
+          [-> (e, i) { opt_map.call }, true]
         when 1
-          -> (e, i) { opt_map.call e }
+          [-> (e, i) { opt_map.call e }, true]
         when 2
-          opt_map
+          [opt_map, true]
         else
           args = Array.new arity - 2, nil
-          -> (e, i) { opt_map.call e, i, *args }
+          [-> (e, i) { opt_map.call e, i, *args }, true]
         end
       else
-        -> (e, i) { e }
+        [-> (e, i) { e }, false]
       end
     end
 
@@ -179,19 +180,23 @@ module MergeEnum
     end
 
     def merge_options opts
+      raise "opts must be a Hash" if opts and not opts.is_a? Hash
       self.class.new *@collections, (@options.merge opts || {})
     end
 
     def merge_options! opts
+      raise "opts must be a Hash" if opts and not opts.is_a? Hash
       @options.merge! opts || {}
       self
     end
 
     def replace_options opts
+      raise "opts must be a Hash" if opts and not opts.is_a? Hash
       self.class.new *@collections, opts || {}
     end
 
     def replace_options! opts
+      raise "opts must be a Hash" if opts and not opts.is_a? Hash
       @options = opts || {}
       self
     end

@@ -67,13 +67,8 @@ describe MergeEnum::MergeEnumerable do
     end
   end
 
-  describe ".new nil" do
-    let(:enum) { Target.new nil }
-    test_error self, :enum, line: __LINE__
-  end
-
-  ["hoge", "foo", "bar"].each do |val|
-    describe ".new '#{val}'" do
+  [nil, "hoge", "foo", "bar"].each do |val|
+    describe ".new #{val.inspect}" do
       let(:enum) { Target.new val }
       test_error self, :enum, line: __LINE__
     end
@@ -104,7 +99,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<positive>" do
         [1, 2, 50].each do |val|
-          describe "#{val}" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -113,7 +108,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<negative>" do
         [-1, -2, -50].each do |val|
-          describe "#{val}" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -137,7 +132,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<illegal>" do
         ["hoge", "foo", "bar"].each do |val|
-          describe "'#{val}'" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -222,7 +217,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<positive>" do
         [1, 2, 50].each do |val|
-          describe "#{val}" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -231,7 +226,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<negative>" do
         [-1, -2, -50].each do |val|
-          describe "#{val}" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -255,7 +250,7 @@ describe MergeEnum::MergeEnumerable do
 
       context "<illegal>" do
         ["hoge", "foo", "bar"].each do |val|
-          describe "'#{val}'" do
+          describe "#{val.inspect}" do
             let(:first) { val }
             test_empty self, :enum, line: __LINE__
           end
@@ -327,6 +322,78 @@ describe MergeEnum::MergeEnumerable do
 
     describe "0...100" do
       let(:ary) { 0...100 }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "Proc.new { 0...100 }" do
+      let(:ary) {
+        ary = Proc.new { 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "Proc.new { |e| 0...100 }" do
+      let(:ary) {
+        ary = Proc.new { |e| 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "Proc.new { |e, i| 0...100 }" do
+      let(:ary) {
+        ary = Proc.new { |e, i| 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "Proc.new { |e, i, x, y, z| 0...100 }" do
+      let(:ary) {
+        ary = Proc.new { |e, i, x, y, z| 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "-> { 0...100 }" do
+      let(:ary) {
+        ary = -> { 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "-> { |e| 0...100 }" do
+      let(:ary) {
+        ary = -> (c) { 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "-> (e, i) { 0...100 }" do
+      let(:ary) {
+        ary = -> (e, i) { 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
+      test_all self, :enum, 0...100, line: __LINE__
+    end
+
+    describe "-> (e, i, x, y, z) { 0...100 }" do
+      let(:ary) {
+        ary = -> (e, i, x, y, z) { 0...100 }
+        allow(ary).to receive(:call).once.and_return 0...100
+        ary
+      }
       test_all self, :enum, 0...100, line: __LINE__
     end
   end
@@ -403,6 +470,16 @@ describe MergeEnum::MergeEnumerable do
           test_all self, :enum, (31...100).step(2), line: __LINE__
         end
 
+        describe "Proc.new { |e, i| e.nil? or e < 30 }" do
+          let(:compact) { Proc.new { |e, i| e.nil? or e < 30 } }
+          test_all self, :enum, (31...100).step(2), line: __LINE__
+        end
+
+        describe "Proc.new { |e, i, x, y, z| e.nil? or e < 30 }" do
+          let(:compact) { Proc.new { |e, i, x, y, z| e.nil? or e < 30 } }
+          test_all self, :enum, (31...100).step(2), line: __LINE__
+        end
+
         describe "-> { true }" do
           let(:compact) { -> { true } }
           test_all self, :enum, [], line: __LINE__
@@ -420,6 +497,16 @@ describe MergeEnum::MergeEnumerable do
 
         describe "-> (e) { e.nil? or e < 30 }" do
           let(:compact) { -> (e) { e.nil? or e < 30 } }
+          test_all self, :enum, (31...100).step(2), line: __LINE__
+        end
+
+        describe "-> (e, i) { e.nil? or e < 30 }" do
+          let(:compact) { -> (e, i) { e.nil? or e < 30 } }
+          test_all self, :enum, (31...100).step(2), line: __LINE__
+        end
+
+        describe "-> (e, i, x, y, z) { e.nil? or e < 30 }" do
+          let(:compact) { -> (e, i, x, y, z) { e.nil? or e < 30 } }
           test_all self, :enum, (31...100).step(2), line: __LINE__
         end
       end
@@ -482,6 +569,16 @@ describe MergeEnum::MergeEnumerable do
           test_all self, :enum, (1...30).step(2), line: __LINE__
         end
 
+        describe "Proc.new { |e, i| not e.nil? and e < 30 }" do
+          let(:select) { Proc.new { |e, i| not e.nil? and e < 30 } }
+          test_all self, :enum, (1...30).step(2), line: __LINE__
+        end
+
+        describe "Proc.new { |e, i, x, y, z| not e.nil? and e < 30 }" do
+          let(:select) { Proc.new { |e, i, x, y, z| not e.nil? and e < 30 } }
+          test_all self, :enum, (1...30).step(2), line: __LINE__
+        end
+
         describe "-> { true }" do
           let(:select) { -> { true } }
           test_all self, :enum, (0...100).map { |e| e.odd? ? e : nil }, line: __LINE__
@@ -499,6 +596,16 @@ describe MergeEnum::MergeEnumerable do
 
         describe "-> (e) { not e.nil? and e < 30 }" do
           let(:select) { -> (e) { not e.nil? and e < 30 } }
+          test_all self, :enum, (1...30).step(2), line: __LINE__
+        end
+
+        describe "-> (e, i) { not e.nil? and e < 30 }" do
+          let(:select) { -> (e, i) { not e.nil? and e < 30 } }
+          test_all self, :enum, (1...30).step(2), line: __LINE__
+        end
+
+        describe "-> (e, i, x, y, z) { not e.nil? and e < 30 }" do
+          let(:select) { -> (e, i, x, y, z) { not e.nil? and e < 30 } }
           test_all self, :enum, (1...30).step(2), line: __LINE__
         end
       end
@@ -623,7 +730,7 @@ describe MergeEnum::MergeEnumerable do
         describe "130" do
           let(:ary1) {
             ary = Proc.new { |c| 0...100 }
-            allow(ary).to receive(:call).once.with(130).and_return(0...100)
+            allow(ary).to receive(:call).once.with(130).and_return 0...100
             ary
           }
           let(:first) { 130 }
@@ -631,7 +738,7 @@ describe MergeEnum::MergeEnumerable do
           context "<all>" do
             let(:ary2) {
               ary = Proc.new { |c| 200...250 }
-              allow(ary).to receive(:call).once.with(30).and_return(200...250)
+              allow(ary).to receive(:call).once.with(30).and_return 200...250
               ary
             }
             test_equal self, :enum, (0...100).to_a + (200...230).to_a, line: __LINE__
@@ -650,7 +757,7 @@ describe MergeEnum::MergeEnumerable do
         describe "200" do
           let(:ary1) {
             ary = Proc.new { |c| 0...100 }
-            allow(ary).to receive(:call).once.with(200).and_return(0...100)
+            allow(ary).to receive(:call).once.with(200).and_return 0...100
             ary
           }
           let(:ary2) { Proc.new { |c| 200...250 } }
@@ -687,7 +794,7 @@ describe MergeEnum::MergeEnumerable do
         describe "50" do
           let(:ary1) {
             ary = -> (c) { 0...100 }
-            allow(ary).to receive(:call).once.with(50).and_return(0...100)
+            allow(ary).to receive(:call).once.with(50).and_return 0...100
             ary
           }
           let(:ary2) {
@@ -702,7 +809,7 @@ describe MergeEnum::MergeEnumerable do
         describe "130" do
           let(:ary1) {
             ary = -> (c) { 0...100 }
-            allow(ary).to receive(:call).once.with(130).and_return(0...100)
+            allow(ary).to receive(:call).once.with(130).and_return 0...100
             ary
           }
           let(:first) { 130 }
@@ -710,7 +817,7 @@ describe MergeEnum::MergeEnumerable do
           context "<all>" do
             let(:ary2) {
               ary = -> (c) { 200...250 }
-              allow(ary).to receive(:call).once.with(30).and_return(200...250)
+              allow(ary).to receive(:call).once.with(30).and_return 200...250
               ary
             }
             test_equal self, :enum, (0...100).to_a + (200...230).to_a, line: __LINE__
@@ -729,7 +836,7 @@ describe MergeEnum::MergeEnumerable do
         describe "200" do
           let(:ary1) {
             ary = -> (c) { 0...100 }
-            allow(ary).to receive(:call).once.with(200).and_return(0...100)
+            allow(ary).to receive(:call).once.with(200).and_return 0...100
             ary
           }
           let(:ary2) { -> (c) { 200...250 } }
@@ -788,7 +895,7 @@ describe MergeEnum::MergeEnumerable do
         describe "50" do
           let(:ary1) {
             ary = Proc.new { |c| 0...100 }
-            allow(ary).to receive(:call).once.with(50).and_return(0...100)
+            allow(ary).to receive(:call).once.with(50).and_return 0...100
             ary
           }
           let(:ary2) {
@@ -1049,17 +1156,78 @@ describe MergeEnum::MergeEnumerable do
   describe ".new" do
     describe "0...100, Array.new(10, nil), Proc.new { |c| 200...250 }, first: 130, compact: true, map: -> (e) { e * 2 }" do
       let(:enum) { Target.new 0...100, Array.new(10, nil), Proc.new { |c| 200...250 }, first: 130, compact: true, map: map }
-      let(:map) {
-        _proc = -> (e) { raise "using stub" }
-        expect(_proc).to receive(:call).exactly(130).times do |e|
-          e * 2
+
+      describe "map: nil" do
+        let(:map) { nil }
+        subject { enum.to_a }
+        it { is_expected.to eq (0...100).to_a + (200...230).to_a }
+      end
+
+      describe "map: false" do
+        let(:map) { false }
+        subject { enum.to_a }
+        it { is_expected.to eq (0...100).to_a + (200...230).to_a }
+      end
+
+      describe "map: true" do
+        let(:map) { true }
+        subject { enum.to_a }
+        it { expect { is_expected }.to raise_error }
+      end
+
+      ["hoge", "foo", "bar"].each do |m|
+        describe "map: #{m.inspect}" do
+          let(:map) { m }
+          subject { enum.to_a }
+          it { expect { is_expected }.to raise_error }
         end
-        _proc
-      }
-      subject { enum.to_a }
-      it {
-        is_expected.to eq ((0...100).to_a + (200...230).to_a).map{ |e| e * 2 }
-      }
+      end
+
+      describe "map: -> { 100 }" do
+        let(:map) {
+          _proc = -> { raise "using stub" }
+          expect(_proc).to receive(:call).with(no_args).exactly(130).times.and_return 100
+          _proc
+        }
+        subject { enum.to_a }
+        it { is_expected.to eq Array.new(130, 100) }
+      end
+
+      describe "map: -> (e) { e * 2 }" do
+        let(:map) {
+          _proc = -> (e) { raise "using stub" }
+          expect(_proc).to receive(:call).exactly(130).times do |e|
+            e * 2
+          end
+          _proc
+        }
+        subject { enum.to_a }
+        it { is_expected.to eq ((0...100).to_a + (200...230).to_a).map{ |e| e * 2 } }
+      end
+
+      describe "map: -> (e, i) { i }" do
+        let(:map) {
+          _proc = -> (e, i) { raise "using stub" }
+          expect(_proc).to receive(:call).exactly(130).times do |e, i|
+            i
+          end
+          _proc
+        }
+        subject { enum.to_a }
+        it { is_expected.to eq (0...130).to_a }
+      end
+
+      describe "map: -> (e, i, x, y, z) { i }" do
+        let(:map) {
+          _proc = -> (e, i, x, y, z) { raise "using stub" }
+          expect(_proc).to receive(:call).exactly(130).times do |e, i|
+            i
+          end
+          _proc
+        }
+        subject { enum.to_a }
+        it { is_expected.to eq (0...130).to_a }
+      end
     end
   end
 
@@ -1074,11 +1242,7 @@ describe MergeEnum::MergeEnumerable do
           expect(_proc).to receive(:call).exactly(10).times.and_return 0...100
           _proc
         }
-        it {
-          10.times do
-            enum.to_a
-          end
-        }
+        it { 10.times { enum.to_a } }
       end
 
       describe "cache: true" do
@@ -1089,9 +1253,7 @@ describe MergeEnum::MergeEnumerable do
           _proc
         }
         it {
-          10.times do
-            enum.to_a
-          end
+          10.times { enum.to_a }
           enum.options! cache: false
           enum.to_a
         }
@@ -1141,44 +1303,60 @@ describe MergeEnum::MergeEnumerable do
         it { is_expected.to eq ary }
       end
 
-      context "#merge_optons nil" do
-        subject { enum.merge_options(nil).to_a }
-        it { is_expected.to eq ary }
+      [true, 1, "hoge"].each do |opt|
+        context "#merge_optons #{opt.inspect}" do
+          subject { enum.merge_options(opt).to_a }
+          it { expect { is_expected }.to raise_error }
+        end
       end
 
-      context "#merge_optons! nil" do
-        subject { enum.merge_options!(nil).to_a }
-        it { is_expected.to eq ary }
+      [true, 1, "hoge"].each do |opt|
+        context "#merge_optons! #{opt.inspect}" do
+          subject { enum.merge_options!(opt).to_a }
+          it { expect { is_expected }.to raise_error }
+        end
       end
 
-      context "#replace_optons nil" do
-        subject { enum.replace_options(nil).to_a }
-        it { is_expected.to eq ary }
+      [true, 1, "hoge"].each do |opt|
+        context "#replace_optons #{opt.inspect}" do
+          subject { enum.replace_options(opt).to_a }
+          it { expect { is_expected }.to raise_error }
+        end
       end
 
-      context "#replace_optons! nil" do
-        subject { enum.replace_options!(nil).to_a }
-        it { is_expected.to eq ary }
+      [true, 1, "hoge"].each do |opt|
+        context "#replace_optons! #{opt.inspect}" do
+          subject { enum.replace_options!(opt).to_a }
+          it { expect { is_expected }.to raise_error }
+        end
       end
 
-      context "#merge_optons {}" do
-        subject { enum.merge_options({}).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#merge_optons #{opt.inspect}" do
+          subject { enum.merge_options(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
-      context "#merge_optons! {}" do
-        subject { enum.merge_options!({}).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#merge_optons! #{opt.inspect}" do
+          subject { enum.merge_options!(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
-      context "#replace_optons {}" do
-        subject { enum.replace_options({}).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#replace_optons #{opt.inspect}" do
+          subject { enum.replace_options(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
-      context "#replace_optons! {}" do
-        subject { enum.replace_options!({}).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#replace_optons! #{opt.inspect}" do
+          subject { enum.replace_options!(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
       context "#merge_optons({ first: 160 })" do
@@ -1211,44 +1389,32 @@ describe MergeEnum::MergeEnumerable do
         it { is_expected.to eq ary[0...80] }
       end
 
-      context "#merge_optons nil" do
-        subject { enum.merge_options(nil).to_a }
-        it { is_expected.to eq ary[0...80] }
+      [nil, false, {}].each do |opt|
+        context "#merge_optons #{opt.inspect}" do
+          subject { enum.merge_options(opt).to_a }
+          it { is_expected.to eq ary[0...80] }
+        end
       end
 
-      context "#merge_optons! nil" do
-        subject { enum.merge_options!(nil).to_a }
-        it { is_expected.to eq ary[0...80] }
+      [nil, false, {}].each do |opt|
+        context "#merge_optons! #{opt.inspect}" do
+          subject { enum.merge_options!(opt).to_a }
+          it { is_expected.to eq ary[0...80] }
+        end
       end
 
-      context "#replace_optons nil" do
-        subject { enum.replace_options(nil).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#replace_optons #{opt.inspect}" do
+          subject { enum.replace_options(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
-      context "#replace_optons! nil" do
-        subject { enum.replace_options!(nil).to_a }
-        it { is_expected.to eq ary }
-      end
-
-      context "#merge_optons {}" do
-        subject { enum.merge_options({}).to_a }
-        it { is_expected.to eq ary[0...80] }
-      end
-
-      context "#merge_optons! {}" do
-        subject { enum.merge_options!({}).to_a }
-        it { is_expected.to eq ary[0...80] }
-      end
-
-      context "#replace_optons {}" do
-        subject { enum.replace_options({}).to_a }
-        it { is_expected.to eq ary }
-      end
-
-      context "#replace_optons! {}" do
-        subject { enum.replace_options!({}).to_a }
-        it { is_expected.to eq ary }
+      [nil, false, {}].each do |opt|
+        context "#replace_optons! #{opt.inspect}" do
+          subject { enum.replace_options!(opt).to_a }
+          it { is_expected.to eq ary }
+        end
       end
 
       context "#merge_optons({ first: 160 })" do
@@ -1277,7 +1443,7 @@ describe MergeEnum::MergeEnumerable do
         {}, { first: 100 }, { compact: true },
         { hoge: "hoge", foo: "foo" }
       ].each do |opts|
-        describe "0...100, #{opts}" do
+        describe "0...100, #{opts.inspect}" do
           let(:enum) { Target.new 0...100, opts }
 
           context "<@options>" do
@@ -1290,7 +1456,7 @@ describe MergeEnum::MergeEnumerable do
             { first: 100 }, { compact: true },
             { hoge: "hoge", foo: "foo" }
           ].each do |opts_2|
-            describe "#merge_options(#{opts_2})" do
+            describe "#merge_options(#{opts_2.inspect})" do
               let(:enum_2) { enum.merge_options opts_2 }
 
               context "<eq>" do
@@ -1306,7 +1472,7 @@ describe MergeEnum::MergeEnumerable do
               end
             end
 
-            describe "#merge_options!(#{opts_2})" do
+            describe "#merge_options!(#{opts_2.inspect})" do
               let(:enum_2) { enum.merge_options! opts_2 }
 
               context "<eq>" do
@@ -1322,7 +1488,7 @@ describe MergeEnum::MergeEnumerable do
               end
             end
 
-            describe "#replace_options(#{opts_2})" do
+            describe "#replace_options(#{opts_2.inspect})" do
               let(:enum_2) { enum.replace_options opts_2 }
 
               context "<eq>" do
@@ -1341,7 +1507,7 @@ describe MergeEnum::MergeEnumerable do
               end
             end
 
-            describe "#replace_options!(#{opts_2})" do
+            describe "#replace_options!(#{opts_2.inspect})" do
               let(:enum_2) { enum.replace_options! opts_2 }
 
               context "<eq>" do
