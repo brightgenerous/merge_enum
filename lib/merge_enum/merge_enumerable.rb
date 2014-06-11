@@ -28,17 +28,22 @@ module MergeEnum
       end
 
       # options
-      opt_fst = @options[:first]
-      opt_fst = opt_fst.to_i if opt_fst
+      opt_fst = option_first @options
       (opt_proc, _proc) = merge_options_proc @options
       (opt_map, _map) = map_proc @options
+      opt_fill = @options[:fill]
 
       # local variables
       cnt = 0
       fst = nil
       cache = [] if opt_cache
 
-      @collections.each do |c|
+      cs = if opt_fst and opt_fill
+             @collections + [opt_fill]
+           else
+             @collections
+           end
+      cs.each do |c|
         if opt_fst
           fst = opt_fst - cnt
           break if fst <= 0
@@ -95,6 +100,23 @@ module MergeEnum
     end
 
     private
+
+    def option_first options
+      opt_fst = options[:first]
+      if opt_fst
+        if opt_fst.is_a? Proc
+          arity = opt_fst.arity.abs
+          case arity
+          when 0
+            opt_fst = opt_fst.call
+          else
+            opt_fst = opt_fst.call *Array.new(arity, nil)
+          end
+        end
+        opt_fst = opt_fst.to_i
+      end
+      opt_fst
+    end
 
     def merge_options_proc options
       opts = []

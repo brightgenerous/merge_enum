@@ -656,6 +656,92 @@ describe MergeEnum::MergeEnumerable do
   end
 
   describe ".new" do
+    let(:enum) { Target.new ary, fill: fill }
+    describe "0...100," do
+      let(:ary) { 0...100 }
+
+      describe "fill:" do
+        describe "nil" do
+          let(:fill) { nil }
+
+          test_all self, :enum, 0...100, line: __LINE__
+        end
+
+        describe "true" do
+          let(:fill) { true }
+
+          test_all self, :enum, 0...100, line: __LINE__
+        end
+
+        describe "false" do
+          let(:fill) { false }
+
+          test_all self, :enum, 0...100, line: __LINE__
+        end
+      end
+    end
+  end
+
+  describe ".new" do
+    let(:enum) { Target.new ary, first: first, fill: fill }
+    describe "0...100," do
+      let(:ary) { 0...100 }
+      describe "first:" do
+        describe "150," do
+          let(:first) { 150 }
+
+          [nil, "hoge", "foo", "bar"].each do |val|
+            describe "fill: #{val.inspect}" do
+              let(:fill) { val }
+              test_interrupt self, :enum, (0...100).to_a, line: __LINE__
+            end
+          end
+
+          describe "fill:" do
+            describe "200...300" do
+              let(:fill) { 200...300 }
+
+              test_all self, :enum, (0...100).to_a + (200...250).to_a, line: __LINE__
+            end
+
+            describe "Proc.new { 200...300 }" do
+              let(:fill) { Proc.new { 200...300 } }
+
+              test_all self, :enum, (0...100).to_a + (200...250).to_a, line: __LINE__
+            end
+
+            describe "Proc.new { |c| 200...300 }" do
+              let(:fill) {
+                _proc = Proc.new { |c| 200...300 }
+                expect(_proc).to receive(:call).with(50).once.and_return 200...300
+                _proc
+              }
+
+              test_equal self, :enum, (0...100).to_a + (200...250).to_a, line: __LINE__
+            end
+
+            describe "-> { 200...300 }" do
+              let(:fill) { -> { 200...300 } }
+
+              test_all self, :enum, (0...100).to_a + (200...250).to_a, line: __LINE__
+            end
+
+            describe "-> (c) { 200...300 }" do
+              let(:fill) {
+                _proc = -> (c) { 200...300 }
+                expect(_proc).to receive(:call).with(50).once.and_return 200...300
+                _proc
+              }
+
+              test_equal self, :enum, (0...100).to_a + (200...250).to_a, line: __LINE__
+            end
+          end
+        end
+      end
+    end
+  end
+
+  describe ".new" do
     let(:enum) { Target.new ary1, ary2 }
     describe "0...100, 200...250" do
       let(:ary1) { 0...100 }
